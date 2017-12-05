@@ -13,7 +13,7 @@ Then use k-coloring algorithm to solve sudoku.
 
 ## Motivation
 
-A Sudoku Solver using Graph Coloring
+An application to graph coloring
 
 
 ## Contributors
