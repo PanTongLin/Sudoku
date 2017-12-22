@@ -2,17 +2,20 @@
 #include<stdio.h>
 #include<stack>
 using namespace std;
-struct NODE
+/*struct NODE
 {
 	NODE* link[20];
 	int limit[9],n;
-};
+};*/
 
 int main()
 {
-	stack<NODE*> deci,zero;//decision,unfilled 
-	NODE node[81],*p;//nodes,tmp
-	int n,i,j;//tmp
+	stack<int> deci,zero;//decision,unfilled 
+	//NODE node[81],*p;//nodes,tmp
+	int link[81][20];
+	int limit[81][9];
+	int num[81];
+	int n,i,j,p;//tmp
 	bool pass;//flow judge
 	char c;//tmp
 
@@ -22,11 +25,11 @@ int main()
 		for(j=0;j!=9;j++)
 		{
 			if(j!=i/9)//column
-				node[i].link[n++]=node+j*9+i%9;
+				link[i][n++]=j*9+i%9;
 			if(j!=i%9)//row
-				node[i].link[n++]=node+i/9*9+j;
+				link[i][n++]=i/9*9+j;
 			if(i/27*3+j/3 != i/9 && i%9/3*3+j%3 != i%9)//block
-				node[i].link[n++]=node+i/27*27+j/3*9+i%9/3*3+j%3;
+				link[i][n++]=i/27*27+j/3*9+i%9/3*3+j%3;
 		}
 	}
 		
@@ -35,27 +38,27 @@ int main()
 	{
 		for(i=0;i!=81;i++)//initial
 		{
-			node[i].limit[0]=0;
-			node[i].limit[1]=0;
-			node[i].limit[2]=0;
-			node[i].limit[3]=0;
-			node[i].limit[4]=0;
-			node[i].limit[5]=0;
-			node[i].limit[6]=0;
-			node[i].limit[7]=0;
-			node[i].limit[8]=0;
+			limit[i][0]=0;
+			limit[i][1]=0;
+			limit[i][2]=0;
+			limit[i][3]=0;
+			limit[i][4]=0;
+			limit[i][5]=0;
+			limit[i][6]=0;
+			limit[i][7]=0;
+			limit[i][8]=0;
 		}
 				
 		for(i=0;i!=81;i++)
 		{
 			scanf(" %c",&c);
 			c-='1';
-			node[i].n=c;
+			num[i]=c;
 			if(c!=-1)
 				for(j=0;j!=20;j++)//constraint propagation
-					node[i].link[j]->limit[c]++;
+					limit[link[i][j]][c]++;
 			else//unfiiled store
-				zero.push(node+i);
+				zero.push(i);
 		}
 		
 		while(!zero.empty())//until fulfill
@@ -64,13 +67,13 @@ int main()
 			p=zero.top();
 
 			for(i=0;i!=9;i++)//greed coloring
-				if(!p->limit[i])
+				if(!limit[p][i])
 				{
 					zero.pop();
 					pass=true;
 					for(j=0;j!=20;j++)
-						p->link[j]->limit[i]++;
-					p->n=i;
+						limit[link[p][j]][i]++;
+					num[p]=i;
 					deci.push(p);//decision store
 					break;
 				}
@@ -78,14 +81,14 @@ int main()
 			{
 				p=deci.top();deci.pop();//backtrack
 				for(j=0;j!=20;j++)
-					p->link[j]->limit[p->n]--;
-				for(i=p->n+1;i!=9;i++)
-					if(!p->limit[i])
+					limit[link[p][j]][num[p]]--;
+				for(i=num[p]+1;i!=9;i++)
+					if(!limit[p][i])
 					{
 						pass=true;
 						for(j=0;j!=20;j++)
-							p->link[j]->limit[i]++;
-						p->n=i;
+							limit[link[p][j]][i]++;
+						num[p]=i;
 						deci.push(p);
 						break;
 					}
@@ -96,7 +99,7 @@ int main()
 		while(!deci.empty())
 			deci.pop();
 		for(i=0;i!=81;i+=9)
-			printf("%d%d%d%d%d%d%d%d%d\n",node[i].n+1,node[i+1].n+1,node[i+2].n+1,node[i+3].n+1,node[i+4].n+1,node[i+5].n+1,node[i+6].n+1,node[i+7].n+1,node[i+8].n+1);
+			printf("%d%d%d%d%d%d%d%d%d\n",num[i]+1,num[i+1]+1,num[i+2]+1,num[i+3]+1,num[i+4]+1,num[i+5]+1,num[i+6]+1,num[i+7]+1,num[i+8]+1);
 	}
 	return 0;
 }
